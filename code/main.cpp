@@ -5,9 +5,9 @@
 #include <cstring>
 #include <stdio.h>
 
-#define INPUT_NUM 3//输入层节点数
-#define HIDE_NUM 6//隐含层节点数
-#define OUTPUT_NUM 1//输出层节点数
+#define INPUT_NUM 9//输入层节点数
+#define HIDE_NUM 3//隐含层节点数
+#define OUTPUT_NUM 8//输出层节点数
 
 using namespace std;
 
@@ -158,10 +158,10 @@ int Output_Judge(double net_output[], double test_output[])
 
 int main()
 {
-	FILE *train_file=fopen("../data/XOR_train.txt", "r");
-	FILE *test_file=fopen("../data/XOR_test.txt", "r");
-	//FILE *train_file=fopen("../data/IF_train.txt", "r");
-	//FILE *test_file=fopen("../data/IF_test.txt", "r");
+	//FILE *train_file=fopen("../data/XOR_train.txt", "r");
+	//FILE *test_file=fopen("../data/XOR_test.txt", "r");
+	FILE *train_file=fopen("../data/IF_train.txt", "r");
+	FILE *test_file=fopen("../data/IF_test.txt", "r");
 	
 	N_Network net;
 	char str[1000];
@@ -191,7 +191,6 @@ int main()
 				temp=strchr(temp, ' ');
 				temp=strchr(temp, ':');
 				input[train_num][n]=strtod(temp+1, 0);
-				cout<<input[train_num][n]<<' ';
 			}
 		}
 		else if(temp[0]=='O')
@@ -201,16 +200,24 @@ int main()
 				temp=strchr(temp, ' ');
 				temp=strchr(temp, ':');
 				output[train_num][n]=strtod(temp+1, 0);
-				cout<<output[train_num][n]<<' ';
 			}
 			train_num++;
-			cout<<endl;
 		}
 	}
 	fclose(train_file);
 	cout<<"训练数据集样本数: "<<train_num<<endl;
 
 	Init_Network(&net);//初始化网络
+	/*
+	for(int j=0; j<HIDE_NUM; j++)
+		for(int k=0; k<INPUT_NUM; k++)
+				cout<<net.weight1[j][k]<<' ';
+	cout<<endl;
+	for(int i=0; i<OUTPUT_NUM; i++)
+		for(int j=0; j<HIDE_NUM; j++)			
+			cout<<net.weight2[i][j]<<' ';
+	cout<<endl;
+	*/		
 	cout<<"输入层神经元个数："<<INPUT_NUM<<endl;
 	cout<<"隐含层神经元个数："<<HIDE_NUM<<endl;
 	cout<<"输出层神经元个数："<<OUTPUT_NUM<<endl;
@@ -224,7 +231,7 @@ int main()
 	cout<<"\n开始训练"<<endl;
 	//对训练数据集中所有数据进行批训练，使误差小于规定值
 	start=clock();
-	for(int i=0; max_error>0.1 && count<1000000; i++)
+	for(int i=0; max_error>0.1 && count<100000; i++)
 	{
 		//pos=rand()%train_num;
 		max_error=Train_Network(&net, input, output, train_num);
@@ -235,9 +242,10 @@ int main()
 	cout<<"迭代次数: "<<count<<endl;
 	cout<<"训练时间: "<<(double)(finish-start)/CLOCKS_PER_SEC<<"s"<<endl;
 
-	cout<<"\n开始测试"<<endl;
 	double test_input[INPUT_NUM], test_output[OUTPUT_NUM], net_output[OUTPUT_NUM];
 	int right_num=0, sum_num=0;
+	
+	cout<<"\n开始测试"<<endl;
 	//读取测试数据
 	while(!feof(test_file))
 	{
@@ -286,6 +294,16 @@ int main()
 	}
 	fclose(test_file);
 	cout<<"正确率: "<<(double)right_num/sum_num<<endl;
+	/*
+	for(int j=0; j<HIDE_NUM; j++)
+		for(int k=0; k<INPUT_NUM; k++)
+				cout<<net.weight1[j][k]<<' ';
+	cout<<endl;
+	for(int i=0; i<OUTPUT_NUM; i++)
+		for(int j=0; j<HIDE_NUM; j++)			
+			cout<<net.weight2[i][j]<<' ';
+	cout<<endl;
+	*/
 
 	return 0;
 }
